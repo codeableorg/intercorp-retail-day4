@@ -94,7 +94,9 @@ export async function changeItemQuantity(
   }
 }
 
-export async function removeItem(itemId: number) {
+export async function removeItem(formData: FormData) {
+  console.log(formData);
+
   try {
     const cookieStore = cookies();
     const sessionId = cookieStore.get("cart_session_id")?.value;
@@ -103,6 +105,7 @@ export async function removeItem(itemId: number) {
       throw new Error("No session found");
     }
 
+    const itemId = Number(formData.get("id"));
     // Remove the item
     await removeCartItem(itemId, sessionId);
 

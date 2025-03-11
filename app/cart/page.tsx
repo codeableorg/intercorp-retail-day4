@@ -2,10 +2,17 @@ import { Button, Container, Section } from "@/components/ui";
 
 import styles from "./page.module.css";
 import Link from "next/link";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
+import { fetchCart } from "@/lib/data";
+import { cookies } from "next/headers";
+import { ChangeButton } from "@/components/cart/change-button";
+import { DeleteButton } from "@/components/cart/delete-button";
 
 export default async function Page() {
-  const cart = { items: [], total: 0 };
+  const cookiesStore = cookies();
+  const sessionId = cookiesStore.get("cart_session_id")?.value;
+
+  const cart = sessionId ? await fetchCart(sessionId) : { items: [], total: 0 };
 
   return (
     <Section>
@@ -14,7 +21,8 @@ export default async function Page() {
           <h1 className={styles.cart__title}>Carrito de compras</h1>
           <div className={styles.cart__container}>
             {cart?.items?.map(({ product, quantity, id }) => (
-              <div key={product.id} className={styles.cart__item}>
+              <form key={product.id} className={styles.cart__item}>
+                <input type="hidden" name="id" value={id} />
                 <div className={styles["cart__item-image"]}>
                   <img
                     src={product.img_src}
@@ -27,34 +35,27 @@ export default async function Page() {
                     <h2 className={styles["cart__item-title"]}>
                       {product.title}
                     </h2>
-                    <Button type="submit" size="sm-icon" variant="outline">
-                      <Trash2 />
-                    </Button>
+                    <DeleteButton id={id} />
                   </div>
                   <div className={styles["cart__item-footer"]}>
                     <p className={styles["cart__item-price"]}>
                       ${product.price}
                     </p>
                     <div className={styles["cart__item-quantity"]}>
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        size="sm-icon"
-                        disabled={quantity <= 1}
-                      >
+                      <ChangeButton id={id} quantity={-1}>
                         <Minus />
-                      </Button>
+                      </ChangeButton>
                       <span className={styles["cart__item-display"]}>
                         {quantity}
                       </span>
 
-                      <Button type="submit" variant="outline" size="sm-icon">
+                      <ChangeButton id={id} quantity={1}>
                         <Plus />
-                      </Button>
+                      </ChangeButton>
                     </div>
                   </div>
                 </div>
-              </div>
+              </form>
             ))}
             <div className={styles.cart__total}>
               <p>Total</p>

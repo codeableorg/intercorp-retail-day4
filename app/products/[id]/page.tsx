@@ -30,7 +30,11 @@ export default async function Page({ params }: { params: { id: string } }) {
             <p className={styles.product__description}>{product.description}</p>
             <form action={addItemToCart}>
               <input hidden name="product_id" value={product.id} readOnly />
-              <SubmitButton size="xl" className={styles.product__button}>
+              <SubmitButton
+                size="xl"
+                className={styles.product__button}
+                loadingText="Agregando..."
+              >
                 Agregar al Carrito
               </SubmitButton>
             </form>
